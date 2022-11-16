@@ -5,4 +5,7 @@ export class CreateClinicDto {
 
   @IsString()
   readonly address:string;
+
+  @IsString()
+  readonly type:string;
 }

@@ -1,26 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import {Clinic} from './interfaces/clinic.interface'
 import { v4 as uuid} from 'uuid'; 
+import { CreateClinicDto, UpdateClinicDto } from './dto';
 
 @Injectable()
 export class ClinicService {
-  private clinics:Clinic[] = [
-    {
-      id:uuid(),
-      name:'UPA',
-      address:'Antartida 2230'
-    },
-    {
-      id:uuid(),
-      name:'Hospital',
-      address:'Felix Pagola 1530'
-    },
-    {
-      id:uuid(),
-      name:'Covepam',
-      address:'Espana 2230'
-    },
-  ];
+  private clinics:Clinic[] = [];
   
   findAll(){
     return this.clinics;
@@ -36,4 +21,33 @@ export class ClinicService {
     return clinic;
   }
 
+  create(createClinicDto: CreateClinicDto){
+    const newClinic = {...createClinicDto, id:uuid()}
+    this.clinics.push(newClinic);
+
+    return newClinic
+  }
+
+  update(id:string, updateClinicDto: UpdateClinicDto){
+    let clinic = this.findOneById(id);
+    if(updateClinicDto.id && updateClinicDto.id !== id){
+      throw new BadRequestException('Clinic id is not valid inside body');
+    }
+    clinic = {...clinic, ...updateClinicDto, id}
+    this.clinics = this.clinics.map(e => e.id === id ? clinic : e);
+
+    return clinic;
+  }
+
+  delete(id:string){
+    let clinic = this.findOneById(id);
+    if(!clinic) throw new BadRequestException('Clinic id is not valid');
+
+    this.clinics = this.clinics.filter(e => e.id !== id);
+    return this.clinics;
+  }
+
+  fillWithSeedData(clinics:Clinic[]){
+    this.clinics = clinics
+  }
 }

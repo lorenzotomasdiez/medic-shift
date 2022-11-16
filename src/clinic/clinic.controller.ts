@@ -1,11 +1,10 @@
-import { Controller, Get, UsePipes, Post, Param, ParseUUIDPipe, Body, ValidationPipe} from '@nestjs/common';
+import { Controller, Get, Post, Param, ParseUUIDPipe, Body, Patch, Delete} from '@nestjs/common';
 import { ClinicService } from './clinic.service';
 import { CreateClinicDto } from './dto/create-clinic.dto';
+import { UpdateClinicDto } from './dto/update-clinic.dto';
 
 @Controller('clinic')
-@UsePipes(ValidationPipe)
 export class ClinicController {
- 
   constructor (
     private readonly clinicService:ClinicService
   ){}
@@ -22,7 +21,23 @@ export class ClinicController {
 
   @Post()
   createClinic(@Body() createClinicDto: CreateClinicDto){
-    return createClinicDto;
+    return this.clinicService.create(createClinicDto);
+  }
+
+  @Patch(':id')
+  updateClinic(
+    @Param('id', ParseUUIDPipe) id:string,
+    @Body() updateClinicDto: UpdateClinicDto)
+  {
+    return this.clinicService.update(id, updateClinicDto);
+  }
+
+  @Delete(':id')
+  deleteClinic(
+   @Param('id', ParseUUIDPipe) id:string
+  )
+  {
+    return this.clinicService.delete(id);
   }
 
 }
